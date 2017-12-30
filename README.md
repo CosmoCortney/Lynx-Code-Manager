@@ -21,7 +21,7 @@ Features:
   - The hex representation on the left is in Big Endian for easy readability
   - Signed and unsigned dec representations beneath
   - Poke any custom value back into memory
-Codehandler
+- Codehandler
   - Supports Cheat values of 8, 16, 32 and 64 bits of length
   - Huge Variety of Code Types (View the Code Type Documentation for more details)
     - RAM Writes
