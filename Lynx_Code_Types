@@ -1,0 +1,243 @@
+P: Pointer State - 0 = no pointer, 1 = uses pointer
+S: Value Size - 0 = 8 Bits, 1 = 16 Bits, 2 = 32 Bits, 3 = 64 Bits
+L: Address in BE (right-justified), if P = 1 then L can be used to determine an unsigned offset
+V: Value (right-justified)
+
+
+00 - RAM Write
+	00PSLLLL LLLLLLLL
+	VVVVVVVV VVVVVVVV
+
+01 - String Write
+	01P0YYYY 00000000
+	0000LLLL LLLLLLLL
+	VVVVVVVV VVV....
+		Y = How many bytes to write
+		V = Array of bytes starting at the top left. Fill unused bytes of a line with 0
+		
+02 - Skip Write
+	02PSLLLL LLLLLLLL
+	VVVVVVVV VVVVVVVV
+	IIIIIIII MYYYYYYY
+		I: Address increment (unsigned)
+		M: Mode. 0 = add increment, 1 = subtract increment
+		Y: Count, how many skip writes to perform
+
+08 - Conditional if key is pressed (Experimental)
+	080000XX 000000VV
+	(D00000XX BADF000D)
+		XX: interleave level. Determine to which end if to jump if the condition is false
+		VV: Key Value (ASCII hex)
+			*Note, as of now only one of these codes can be used at a time
+
+09 - Conditional If (unsigned)
+	09PST0XX 00000000
+	0000LLLL LLLLLLLL
+	VVVVVVVV VVVVVVVV
+	(D00000XX BADF000D)
+		T: Type
+			0 = if equal to
+			1 = if not equal to
+			2 = if greater than
+			3 = if greater than or equal
+			4 = if less than
+			5 = if less than or equal
+			6 = AND (if at least VV bits are present)
+			7 = OR (if at least one of VV bits is present)
+		XX: interleave level. Determine to which end if to jump if the condition is false
+
+0A - Conditional if value between
+	0APST0XX 00000000
+	0000LLLL LLLLLLLL
+	VVVVVVVV VVVVVVVV
+	WWWWWWWW WWWWWWWW
+	(D00000XX BADF000D)
+		T: Type.
+			0 = value between V and W
+			1 = value not between V and W
+		XX: interleave level. Determine to which end if to jump if the condition is false
+
+20 - Load Integer
+	20PSRRMM 00000000
+	0000LLLL LLLLLLLL
+		RR = Register in which the value should be stored
+		MM = Mode
+			00 and 01 = Scalar. Loads single int of size S into RR
+			02 - FF = Packed. Number of consecutive values of size S to store into registers starting at RR
+
+21 - Store Integer
+	21PSRRMM 00000000
+	0000LLLL LLLLLLLL
+		RR = Register from where the value should be read
+		MM = Mode
+			00 and 01 = Scalar. Reads single int of size S from RR
+			02 - FF = Packed. Number of consecutive values of size S to read from registers starting at RR
+
+22 - Integer Operation
+	220SMMTT RRЯЯ0000
+	VVVVVVVV VVVVVVVV
+		RR = First register of which to operate with. This one will hold the result of the operation.
+		ЯЯ = Second Register of which value to operate with. Usage depents on type
+		MM = Mode
+			00 and 01 = Scalar. Reads single int of size S from RR/ЯЯ
+			02 - FF = Packed. Number of consecutive values of size S to read from registers starting at RR/ЯЯ
+		TT = Operation Type
+			00: add RR # ЯЯ
+			01: subtract RR # ЯЯ
+			02: multiply RR # ЯЯ
+			03: divide RR # ЯЯ
+			04: modulu RR # ЯЯ
+			05: square root of RR
+			06: RR to the power of ЯЯ
+			07: negate RR
+			08: NOT RR
+			09: AND RR # ЯЯ
+			0A: OR RR # ЯЯ
+			0B: NAND RR # ЯЯ
+			0C: NOR RR # ЯЯ
+			0D: XOR RR # ЯЯ
+			0E: XNOR RR # ЯЯ
+			0F: Int to Float float-RR # ЯЯ
+			10: Int to Double double-RR # ЯЯ
+			11: add RR # static-ЯЯ
+			12: subtract RR # static-ЯЯ
+			13: multiply RR # static-ЯЯ
+			14: divide RR # static-ЯЯ
+			15: modulu RR # static-ЯЯ
+			16: AND RR # static-ЯЯ
+			17: OR RR # static-ЯЯ
+			18: NAND RR # static-ЯЯ
+			19: NOR RR # static-ЯЯ
+			1A: XOR RR # static-ЯЯ
+			1B: XNOR RR # static-ЯЯ
+			1C: add RR # V
+			1D: subtract RR # V
+			1E: multiply RR # V
+			1F: divide RR # V
+			20: modulu RR # V
+			21: RR to the power of V
+			22: AND RR # V
+			23: OR RR # V
+			24: NAND RR # V
+			25: NOR RR # V
+			26: XOR RR # V
+			27: XNOR RR # V
+			28: shift left RR by V
+			29: shift right RR by V
+
+23 - Load Float Single
+	23P0RRMM 00000000
+	0000LLLL LLLLLLLL
+		RR = Register in which the float should be stored
+		MM = Mode
+			00 and 01 = Scalar. Loads single float single into RR
+			02 - FF = Packed. Number of consecutive floats to store into registers starting at RR
+
+
+24 - Store Float Single
+	24P0RRMM 00000000
+	0000LLLL LLLLLLLL
+		RR = Register from where the float should be read
+		MM = Mode
+			00 and 01 = Scalar. Reads single float of size S from RR
+			02 - FF = Packed. Number of consecutive floats to read from registers starting at RR
+
+25 - Float Single Operation
+	250SMMTT RRЯЯ0000
+	VVVVVVVV VVVVVVVV
+		RR = First register of which to operate with. This one will hold the result of the operation.
+		ЯЯ = Second Register of which value to operate with. Usage depents on type
+		MM = Mode
+			00 and 01 = Scalar. Reads single float from RR/ЯЯ
+			02 - FF = Packed. Number of consecutive floats to read from registers starting at RR/ЯЯ
+		TT = Operation Type
+			00: add RR # ЯЯ
+			01: subtract RR # ЯЯ
+			02: multiply RR # ЯЯ
+			03: divide RR # ЯЯ
+			04: square root of RR
+			05: RR to the power of ЯЯ
+			06: float to int int-RR # RR
+			07: float to double double-RR # RR
+			08: add RR # static-ЯЯ
+			09: subtract RR # static-ЯЯ
+			0A: multiply RR # static-ЯЯ
+			0B: divide RR # static-ЯЯ
+			0C: RR to the power of static-ЯЯ
+			0D: add RR # VV
+			0E: subtract RR # VV
+			0F: multiply RR # VV
+			10: divide RR # VV
+			11: RR to the power of VV
+
+26 - Load Float Double
+	26P0RRMM 00000000
+	0000LLLL LLLLLLLL
+		RR = Register in which the float should be stored
+		MM = Mode
+			00 and 01 = Scalar. Loads single float single into RR
+			02 - FF = Packed. Number of consecutive floats to store into registers starting at RR
+
+27 - Store Float Double
+	27P0RRMM 00000000
+	0000LLLL LLLLLLLL
+		RR = Register from where the float should be read
+		MM = Mode
+			00 and 01 = Scalar. Reads single float of size S from RR
+			02 - FF = Packed. Number of consecutive floats to read from registers starting at RR
+
+28 - Float Double Operation
+	280SMMTT RRЯЯ0000
+	VVVVVVVV VVVVVVVV
+		RR = First register of which to operate with. This one will hold the result of the operation.
+		ЯЯ = Second Register of which value to operate with. Usage depents on type
+		MM = Mode
+			00 and 01 = Scalar. Reads single float from RR/ЯЯ
+			02 - FF = Packed. Number of consecutive floats to read from registers starting at RR/ЯЯ
+		TT = Operation Type
+			00: add RR # ЯЯ
+			01: subtract RR # ЯЯ
+			02: multiply RR # ЯЯ
+			03: divide RR # ЯЯ
+			04: square root of RR
+			05: RR to the power of ЯЯ
+			06: float to int int-RR # RR
+			07: float to double double-RR # RR
+			08: add RR # static-ЯЯ
+			09: subtract RR # static-ЯЯ
+			0A: multiply RR # static-ЯЯ
+			0B: divide RR # static-ЯЯ
+			0C: RR to the power of static-ЯЯ
+			0D: add RR # VV
+			0E: subtract RR # VV
+			0F: multiply RR # VV
+			10: divide RR # VV
+			11: RR to the power of VV
+
+30 - Load Pointer
+	30PSLLLL LLLLLLLL
+	XX00STRT OF-RANGE
+	0000END- OF-RANGE
+	(D10000XX ABAD1DEA)
+		S = size. 0 = 32-bits, 1 = 64-bits
+		XX = to which branch label to jump if pointer is out of range/invalid
+		STRT OF-RANGE: Smallest pointer to be accepted
+		END- OF-RANGE: Biggest pointer to be accepted
+
+31 - Add/Sub offset to/from pointer
+	3100000M QQQQQQQQ
+		M = Mode. 0 = add, 1 = subtract
+		Q = Unsigned offset
+
+
+D0 - End if
+	D00000XX BADF000D
+		XX = Endif level
+D1 - Branch to here if pointer is invalid
+	D10000XX ABAD1DEA
+		XX = Pointer level
+
+D2 - No Operation
+	D2000000 DEADCODE
+D1 - Branch here if pointer is invalid
+D2 - No Operation
