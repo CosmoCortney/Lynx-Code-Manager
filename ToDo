@@ -1,0 +1,8 @@
+- Adjust font size of labels and memory viewer to be rendered properly on higher resolutions than 1080p.
+- Fix a bug where saving the cheat list crashes the application.
+- Make usage of multiple 08-Code Types possible
+- Add Code Type to fill a certain memory area with any value
+- Update links in the "About" tab
+- Make memory dumping faster
+- Make dump process dumping 0 when memory is not readable
+- support for PID in hex and dec
