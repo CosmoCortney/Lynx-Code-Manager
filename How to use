@@ -1,0 +1,45 @@
+In order to hook up to the target process you need to retrieve its process ID (PID).
+  You can find the process ID by opening the Windows Task Manager under "Details" and "Services".
+  If a process ID is not listet there you can use Cheat Engine.
+    - On the process list you can find an 8-digit hex number infront of every processes name.
+    - convert it to decimal and you have gotten the required PID.
+  Back on the Lynx Code Manager paste the PID into the corresponding text line on the bottom and click "Open Process".
+  Certain elements should now become enabled.
+  
+  Add new cheat file
+    - click the "New Cheat File" button to open a dialog to enter a name for your cheat file. It will be saved under "C:\users\<username>\documents\Lynx Code Manager\Cheat Files\"
+    - Now click "Add New Cheat" to add a cheat to the list box.
+    - You can now name it, add the cheat (watch the code type documentation) and give more details
+    - IF YOU HAVE ONLY ONE CHEAT IN THE LIST AND WANT TO SAVE IT SELECT IT BEFORE CLICKING ON "Save Edits". THERE'S A BUG THAT WILL CRASH THE PROGRAM. (going to fix that soon)
+    - Save any edits before you want to apply them.
+    
+  Opening Cheat Files
+    - Click "Open Cheat File" and select the file you want.
+  
+  Applying Cheats
+    - Once a cheat file is loaded or cheated check all cheats you want to apply and click "Enable Cheats"
+    - use the slider on the bottom to change the execution rate
+    - Click on "disable cheats" to disable them
+    
+    
+    
+Memory Viewer
+  Opening the Memory Viewer
+    - Click on "Open RAM Viewer"
+  
+  Viewing a certain memory location
+    - Paste an address into the Address' text line
+    - click on "Go To"
+  
+  Refreshing/Updating the view
+    - Click on "Refresh" to manually refresh the view
+    - check "Auto-Refresh" to manually refresh the view 60 times a second
+    
+  Poking a value into RAM
+    - Edit the value of the hex representation and click poke to write it into RAM (no permanent write)
+    
+  Reading a single value
+    - Click on "Read" to only update the value of the selected address
+    
+  Defining the Read and Poke value size
+    - Simply check the corresponding radio button
